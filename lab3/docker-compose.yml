@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:4.4
+    container_name: movie-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: movie_db
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - movie-network
+
+  app:
+    build: ./app
+    container_name: movie-backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      MONGODB_URL: mongodb://admin:password123@mongodb:27017/
+      DATABASE_NAME: movie_db
+    depends_on:
+      - mongodb
+    networks:
+      - movie-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  movie-network:
+    driver: bridge
